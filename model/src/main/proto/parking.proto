@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package com.example.parking.model;
+
+option java_multiple_files = true;
+option java_package = "com.example.parking.model";
+
+message Vehicle {
+  string id = 1;
+  string license_plate = 2;
+  string state = 3;  // State/province of registration
+  VehicleType type = 4;
+}
+
+enum VehicleType {
+  UNKNOWN = 0;
+  CAR = 1;
+  TRUCK = 2;
+  MOTORCYCLE = 3;
+  BUS = 4;
+}
+
+message Zone {
+  string id = 1;
+  string name = 2;
+  int32 total_spaces = 3;
+  repeated Space spaces = 4;
+}
+
+message Space {
+  string id = 1;
+  string zone_id = 2;
+  SpaceStatus status = 3;
+  Vehicle vehicle = 4;  // Changed from vehicle_id to Vehicle
+  int64 occupied_at = 5;
+}
+
+enum SpaceStatus {
+  VACANT = 0;
+  OCCUPIED = 1;
+}
+
+message ParkingEvent {
+  string event_id = 1;
+  string space_id = 2;
+  string zone_id = 3;
+  EventType event_type = 4;
+  Vehicle vehicle = 5;  // Changed from vehicle_id to Vehicle
+  int64 timestamp = 6;
+}
+
+enum EventType {
+  VEHICLE_ENTERED = 0;
+  VEHICLE_EXITED = 1;
+} 

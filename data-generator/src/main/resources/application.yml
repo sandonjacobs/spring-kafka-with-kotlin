@@ -1,0 +1,13 @@
+simulation:
+  totalEvents: 100
+  entryProbability: 0.6
+  delay: 250 # milliseconds
+  timeOfDay:
+    enabled: true
+    startHour: 6 # 6 AM
+    endHour: 22 # 10 PM
+  eventRate:
+    peakRate: 10 # events per second during peak hours
+    offPeakRate: 2 # events per second during off-peak hours
+    peakHours: [8, 17] # 8 AM and 5 PM are peak hours
+  initialOccupancy: 0.3 # 30% of spaces occupied at start 
