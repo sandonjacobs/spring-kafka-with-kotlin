@@ -2,6 +2,9 @@ package com.example.parking
 
 import com.example.parking.generator.ParkingEventGenerator
 import com.example.parking.model.ParkingGarage
+import com.example.parking.producer.ParkingEventProducer
+import org.slf4j.LoggerFactory
+import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.boot.ApplicationRunner
@@ -36,35 +39,44 @@ data class EventRateProperties(
 
 @SpringBootApplication
 @EnableConfigurationProperties(SimulationProperties::class)
-open class DataGeneratorApplication {
-    @Bean
-    open fun runner(properties: SimulationProperties): ApplicationRunner = ApplicationRunner {
-        val garage = ParkingGarage()
-        val generator = ParkingEventGenerator(garage, properties.initialOccupancy)
+open class DataGeneratorApplication(private val simulationProperties: SimulationProperties) {
 
-        println("Starting parking event simulation...")
-        repeat(properties.totalEvents) { i ->
-            val event = if (Math.random() < properties.entryProbability) {
-                generator.generateEntryEvent()
-            } else {
-                generator.generateExitEvent()
-            }
-            if (event != null) {
-                println("Event #${i + 1}: $event")
-            }
-            val currentHour = LocalDateTime.now().hour
-            val isPeakHour = properties.eventRate.peakHours.contains(currentHour)
-            val rate = if (isPeakHour) properties.eventRate.peakRate else properties.eventRate.offPeakRate
-            val delay = 1000L / rate
-            Thread.sleep(delay)
-        }
-        println("Simulation complete.")
+    companion object {
+        private val log = LoggerFactory.getLogger(DataGeneratorApplication::class.java)
     }
 
     @Bean
-    open fun parkingEventGenerator(properties: SimulationProperties): ParkingEventGenerator {
+    open fun parkingEventGenerator(): ParkingEventGenerator {
         val garage = ParkingGarage()
-        return ParkingEventGenerator(garage, properties.initialOccupancy)
+        return ParkingEventGenerator(garage, simulationProperties.initialOccupancy)
+    }
+
+    @Bean
+    open fun run(generator: ParkingEventGenerator, producer: ParkingEventProducer): CommandLineRunner {
+        return CommandLineRunner {
+            log.info("Starting parking event simulation...")
+            
+            repeat(simulationProperties.totalEvents) { i ->
+                val event = if (Math.random() < simulationProperties.entryProbability) {
+                    generator.generateEntryEvent()
+                } else {
+                    generator.generateExitEvent()
+                }
+                
+                if (event != null) {
+                    producer.send(event)
+                    log.info("Event #${i + 1} sent to Kafka: $event")
+                }
+                
+                val currentHour = LocalDateTime.now().hour
+                val isPeakHour = simulationProperties.eventRate.peakHours.contains(currentHour)
+                val rate = if (isPeakHour) simulationProperties.eventRate.peakRate else simulationProperties.eventRate.offPeakRate
+                val delay = 1000L / rate
+                Thread.sleep(delay)
+            }
+            
+            log.info("Simulation complete.")
+        }
     }
 }
 

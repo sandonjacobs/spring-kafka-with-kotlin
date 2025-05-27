@@ -1,13 +1,20 @@
+kafka:
+  bootstrap-servers: localhost:9092
+  schema-registry:
+    url: http://localhost:8081
+  producer:
+    topic: parking-events-proto
+
 simulation:
-  totalEvents: 100
-  entryProbability: 0.6
-  delay: 250 # milliseconds
-  timeOfDay:
+  total-events: 100
+  entry-probability: 0.6
+  delay: 1000
+  time-of-day:
     enabled: true
-    startHour: 6 # 6 AM
-    endHour: 22 # 10 PM
-  eventRate:
-    peakRate: 10 # events per second during peak hours
-    offPeakRate: 2 # events per second during off-peak hours
-    peakHours: [8, 17] # 8 AM and 5 PM are peak hours
-  initialOccupancy: 0.3 # 30% of spaces occupied at start 
+    start-hour: 6
+    end-hour: 22
+  event-rate:
+    peak-rate: 10
+    off-peak-rate: 2
+    peak-hours: [8, 17]
+  initial-occupancy: 0.3 

@@ -1,9 +1,9 @@
-package com.example.parking.generator
+package com.example.parking.model
 
-import com.example.parking.model.ParkingGarage
-import com.example.parking.model.SpaceStatus
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ParkingGarageTest {
     private val garage = ParkingGarage()
@@ -17,14 +17,14 @@ class ParkingGarageTest {
     @Test
     fun `garage has correct total number of spaces`() {
         val zones = garage.createGarage()
-        val totalSpaces = zones.sumOf { it.spacesCount }
+        val totalSpaces = zones.sumOf { it.totalSpaces }
         assertEquals(ParkingGarage.TOTAL_SPACES, totalSpaces, "Garage should have ${ParkingGarage.TOTAL_SPACES} total spaces")
     }
 
     @Test
     fun `each zone has correct number of spaces`() {
         val zones = garage.createGarage()
-        val zoneSpaces = zones.associate { it.id to it.spacesCount }
+        val zoneSpaces = zones.associate { it.id to it.totalSpaces }
         
         assertEquals(50, zoneSpaces["P1"], "Level 1 should have 50 spaces")
         assertEquals(80, zoneSpaces["P2"], "Level 2 should have 80 spaces")
@@ -53,7 +53,6 @@ class ParkingGarageTest {
         val allSpaces = zones.flatMap { it.spacesList }
         
         allSpaces.forEach { space ->
-            println("Space ID: ${space.id}")
             assertTrue(space.id.matches(Regex("P\\d{1,2}-\\d{3}")), 
                 "Space ID ${space.id} should match format P{level}-{spaceNumber}")
         }
@@ -75,7 +74,7 @@ class ParkingGarageTest {
         val space = garage.getRandomVacantSpace(zones)
         
         assertNotNull(space, "Random vacant space should not be null")
-        assertEquals(SpaceStatus.VACANT, space!!.status, 
+        assertEquals(SpaceStatus.VACANT, space.status, 
             "Random space should be vacant")
     }
 

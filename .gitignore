@@ -19,3 +19,14 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Add a rule to ignore all .DS_Store files anywhere in the project
+.DS_Store
+
+# IntelliJ IDEA related files and directories
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
