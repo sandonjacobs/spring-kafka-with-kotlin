@@ -4,11 +4,13 @@ kafka:
     url: http://localhost:8081
   producer:
     topic: parking-events-proto
+    occupancy-topic: parking-occupancy-by-zone
 
 simulation:
-  total-events: 100
+  total-events: 1000
   entry-probability: 0.6
   delay: 1000
+  initial-occupancy: 0.3
   time-of-day:
     enabled: true
     start-hour: 6
@@ -16,5 +18,4 @@ simulation:
   event-rate:
     peak-rate: 10
     off-peak-rate: 2
-    peak-hours: [8, 17]
-  initial-occupancy: 0.3 
+    peak-hours: [8, 17] 

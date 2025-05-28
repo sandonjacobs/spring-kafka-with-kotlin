@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class KafkaProperties(
     val bootstrapServers: String = "localhost:9092",
     val schemaRegistry: SchemaRegistryProperties = SchemaRegistryProperties(),
-    val producer: ProducerProperties = ProducerProperties()
+    val producer: ProducerProperties
 )
 
 data class SchemaRegistryProperties(
@@ -14,5 +14,6 @@ data class SchemaRegistryProperties(
 )
 
 data class ProducerProperties(
-    val topic: String = "parking-events-proto"
+    val topic: String,
+    val occupancyTopic: String
 ) 

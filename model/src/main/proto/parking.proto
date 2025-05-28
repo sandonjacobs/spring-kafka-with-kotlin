@@ -52,4 +52,11 @@ message ParkingEvent {
 enum EventType {
   VEHICLE_ENTERED = 0;
   VEHICLE_EXITED = 1;
+}
+
+message ZoneOccupancy {
+  string zone_id = 1;
+  int32 occupied_spaces = 2;
+  int32 vacant_spaces = 3;
+  int32 total_spaces = 4;
 } 

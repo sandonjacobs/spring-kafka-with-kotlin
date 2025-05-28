@@ -1,6 +1,7 @@
 package com.example.parking.generator
 
 import com.example.parking.model.*
+import com.example.parking.model.ParkingGarage
 import java.time.Instant
 import java.util.UUID
 import kotlin.random.Random
@@ -38,6 +39,27 @@ class ParkingEventGenerator(
                 .setOccupiedAt(now)
                 .build()
             state[occupiedSpace.id] = occupiedSpace
+        }
+    }
+
+    /**
+     * Generate initial ZoneOccupancy events for each zone based on the initialOccupancy parameter.
+     * These events represent the starting state of the garage.
+     */
+    fun generateInitialZoneOccupancies(): List<Pair<String, ZoneOccupancy>> {
+        return zones.map { zone ->
+            val occupiedSpaces = state.values.count { it.zoneId == zone.id && it.status == SpaceStatus.OCCUPIED }
+            val totalSpaces = zone.spacesList.size
+            val vacantSpaces = totalSpaces - occupiedSpaces
+
+            val occupancy = ZoneOccupancy.newBuilder()
+                .setZoneId(zone.id)
+                .setOccupiedSpaces(occupiedSpaces)
+                .setVacantSpaces(vacantSpaces)
+                .setTotalSpaces(totalSpaces)
+                .build()
+
+            zone.id to occupancy
         }
     }
 

@@ -2,18 +2,17 @@ package com.example.parking
 
 import com.example.parking.generator.ParkingEventGenerator
 import com.example.parking.model.ParkingGarage
+import com.example.parking.model.ZoneOccupancy
 import com.example.parking.producer.ParkingEventProducer
+import com.example.parking.producer.ZoneOccupancyProducer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
-import org.springframework.boot.ApplicationRunner
-import org.springframework.context.annotation.Bean
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import java.time.Duration
+import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 @ConfigurationProperties(prefix = "simulation")
 data class SimulationProperties(
@@ -52,10 +51,22 @@ open class DataGeneratorApplication(private val simulationProperties: Simulation
     }
 
     @Bean
-    open fun run(generator: ParkingEventGenerator, producer: ParkingEventProducer): CommandLineRunner {
+    open fun run(
+        generator: ParkingEventGenerator,
+        parkingEventProducer: ParkingEventProducer,
+        occupancyProducer: ZoneOccupancyProducer
+    ): CommandLineRunner {
         return CommandLineRunner {
             log.info("Starting parking event simulation...")
             
+            // First, send initial zone occupancy state
+            log.info("Sending initial zone occupancy state...")
+            generator.generateInitialZoneOccupancies().forEach { (zoneId, occupancy): Pair<String, ZoneOccupancy> ->
+                occupancyProducer.send(zoneId, occupancy)
+            }
+            log.info("Initial zone occupancy state sent.")
+            
+            // Then start generating random events
             repeat(simulationProperties.totalEvents) { i ->
                 val event = if (Math.random() < simulationProperties.entryProbability) {
                     generator.generateEntryEvent()
@@ -64,7 +75,7 @@ open class DataGeneratorApplication(private val simulationProperties: Simulation
                 }
                 
                 if (event != null) {
-                    producer.send(event)
+                    parkingEventProducer.send(event)
                     log.info("Event #${i + 1} sent to Kafka: $event")
                 }
                 
