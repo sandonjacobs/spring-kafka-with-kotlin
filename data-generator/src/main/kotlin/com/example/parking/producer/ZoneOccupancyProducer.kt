@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ZoneOccupancyProducer(
-    private val kafkaTemplate: KafkaTemplate<String, ZoneOccupancy>,
+    private val kafkaTemplate: KafkaTemplate<String, com.google.protobuf.GeneratedMessageV3>,
     private val kafkaProperties: KafkaProperties
 ) {
     private val log = LoggerFactory.getLogger(ZoneOccupancyProducer::class.java)

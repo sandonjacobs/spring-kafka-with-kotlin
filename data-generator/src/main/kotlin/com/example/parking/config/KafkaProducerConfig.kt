@@ -1,5 +1,6 @@
 package com.example.parking.config
 
+import com.google.protobuf.GeneratedMessageV3
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
@@ -15,7 +16,7 @@ import org.springframework.kafka.core.ProducerFactory
 open class KafkaProducerConfig(private val kafkaProperties: KafkaProperties) {
 
     @Bean
-    open fun producerFactory(): ProducerFactory<String, com.example.parking.model.ParkingEvent> {
+    open fun producerFactory(): ProducerFactory<String, GeneratedMessageV3> {
         val configProps = mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
@@ -26,6 +27,6 @@ open class KafkaProducerConfig(private val kafkaProperties: KafkaProperties) {
     }
 
     @Bean
-    open fun kafkaTemplate(): KafkaTemplate<String, com.example.parking.model.ParkingEvent> =
+    open fun kafkaTemplate(): KafkaTemplate<String, GeneratedMessageV3> =
         KafkaTemplate(producerFactory())
 } 

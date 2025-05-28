@@ -14,6 +14,6 @@ data class SchemaRegistryProperties(
 )
 
 data class ProducerProperties(
-    val topic: String,
+    val parkingEventsTopic: String,
     val occupancyTopic: String
 ) 
