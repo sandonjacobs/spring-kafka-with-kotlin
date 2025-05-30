@@ -11,12 +11,24 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 
+/**
+ * Configuration class for setting up the Kafka consumer for zone status updates.
+ * Configures the consumer factory and listener container factory for processing ZoneOccupancy messages.
+ *
+ * @property bootstrapServers Kafka bootstrap servers configuration
+ * @property schemaRegistryUrl URL of the Schema Registry for Protobuf deserialization
+ */
 @Configuration
 class ZoneStatusConsumerConfig(
     @Value(value = "\${spring.kafka.bootstrap-servers}") private val bootstrapServers: String,
     @Value(value = "\${spring.kafka.properties.[schema.registry.url]}") private val schemaRegistryUrl: String
 ) {
 
+    /**
+     * Creates a Kafka consumer factory for ZoneOccupancy messages.
+     *
+     * @return A configured ConsumerFactory for ZoneOccupancy messages
+     */
     @Bean
     fun consumerFactory(): ConsumerFactory<String, ZoneOccupancy> {
         val configProps = mapOf(
@@ -29,6 +41,11 @@ class ZoneStatusConsumerConfig(
         return DefaultKafkaConsumerFactory(configProps)
     }
 
+    /**
+     * Creates a Kafka listener container factory for processing ZoneOccupancy messages.
+     *
+     * @return A configured ConcurrentKafkaListenerContainerFactory
+     */
     @Bean
     fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, ZoneOccupancy> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, ZoneOccupancy>()

@@ -1,0 +1,154 @@
+= Parking Garage System 🏢
+
+[.lead]
+A Spring Boot application demonstrating real-time parking garage management using Spring Kafka and Kotlin.
+
+== Overview 🎯
+
+[.lead]
+This application simulates a parking garage system that tracks vehicle entries and exits in real-time using Kafka for event streaming.
+
+[cols="1,1", grid=none, frame=none]
+|===
+|{nbsp} +
+[source,asciidoc]
+----
+  🚗  🚙  🚕
+  ╱╲  ╱╲  ╱╲
+ ╱  ╲╱  ╲╱  ╲
+╱    ╱╲    ╱╲
+----
+|{nbsp} +
+*Real-time tracking of parking spaces*
+*Event-driven architecture with Kafka*
+*RESTful API for status queries*
+|===
+
+== Features ✨
+
+* Real-time parking space tracking
+* Multiple parking zones with individual capacity
+* Event-driven architecture using Kafka
+* REST API for querying parking status
+* Caching layer for quick status lookups
+* Protocol Buffers for efficient message serialization
+
+== Architecture 🏗️
+
+[cols="1,1", grid=none, frame=none]
+|===
+|{nbsp} +
+[source,asciidoc]
+----
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│  Event  │    │  Kafka  │    │  Cache  │
+│Generator│───>│ Streams │───>│ Service │
+└─────────┘    └─────────┘    └─────────┘
+      │             │              │
+      │             │              │
+      ▼             ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Parking │    │  REST   │    │  Zone   │
+│ Events  │    │  API    │    │ Status  │
+└─────────┘    └─────────┘    └─────────┘
+----
+|{nbsp} +
+*Event Generation*
+*Stream Processing*
+*Status Caching*
+*REST API*
+|===
+
+== Requirements 📋
+
+* Java 17 or higher
+* Apache Kafka 3.x
+* Gradle 8.5+
+* Protocol Buffers compiler
+
+== Getting Started 🚀
+
+=== Prerequisites
+
+1. Install Java 17 or higher
+2. Install and start Apache Kafka
+3. Install Protocol Buffers compiler
+
+=== Building the Project
+
+[source,bash]
+----
+./gradlew build
+----
+
+=== Running the Application
+
+1. Start Apache Kafka
+2. Run the application:
+[source,bash]
+----
+./gradlew bootRun
+----
+
+== API Endpoints 🌐
+
+* `GET /api/zones` - Get current status of all parking zones
+
+== Technology Stack 💻
+
+* Kotlin 1.9.22
+* Spring Boot 3.2.3
+* Spring Kafka
+* Protocol Buffers
+* Gradle with Kotlin DSL
+* Caffeine Cache
+
+== Development 🛠️
+
+=== Project Structure
+
+[source,asciidoc]
+----
+src/main/kotlin/com/example/parking/
+├── controller/    # REST API endpoints
+├── model/        # Data models and Protobuf definitions
+├── service/      # Business logic and caching
+├── streams/      # Kafka Streams processing
+├── consumer/     # Kafka consumers
+└── generator/    # Event generation
+----
+
+== License 📄
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+The MIT License is a permissive license that is short and to the point. It lets people do anything they want with your code as long as they provide attribution back to you and don't hold you liable.
+
+[source,text]
+----
+MIT License
+
+Copyright (c) 2025 Sandon Jacobs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+----
+
+== Contributing 🤝
+
+Contributions are welcome! Please feel free to submit a Pull Request. 

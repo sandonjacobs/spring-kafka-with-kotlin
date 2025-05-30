@@ -15,12 +15,24 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
 import org.springframework.scheduling.annotation.EnableScheduling
 
+/**
+ * Configuration class for setting up the data generation components.
+ * Configures Kafka producers and the parking garage model.
+ *
+ * @property bootstrapServers Kafka bootstrap servers configuration
+ * @property schemaRegistryUrl URL of the Schema Registry for Protobuf serialization
+ */
 @Configuration
 @EnableScheduling
 class DataGeneratorConfig(
     @Value(value = "\${spring.kafka.bootstrap-servers}") private val bootstrapServers: String,
     @Value(value = "\${spring.kafka.properties.[schema.registry.url]}") private val schemaRegistryUrl: String
 ) {
+    /**
+     * Creates a sample parking garage with predefined zones.
+     *
+     * @return A configured ParkingGarage instance
+     */
     @Bean
     fun parkingGarage(): ParkingGarage {
         return ParkingGarage(
@@ -35,6 +47,11 @@ class DataGeneratorConfig(
         )
     }
 
+    /**
+     * Creates a Kafka producer factory for ParkingEvent messages.
+     *
+     * @return A configured ProducerFactory for ParkingEvent messages
+     */
     @Bean
     fun parkingEventProducerFactory(): ProducerFactory<String, ParkingEvent> {
         val configProps = mapOf(
@@ -46,11 +63,22 @@ class DataGeneratorConfig(
         return DefaultKafkaProducerFactory(configProps)
     }
 
+    /**
+     * Creates a Kafka template for sending ParkingEvent messages.
+     *
+     * @param producerFactory The producer factory to use
+     * @return A configured KafkaTemplate for ParkingEvent messages
+     */
     @Bean
     fun parkingEventKafkaTemplate(producerFactory: ProducerFactory<String, ParkingEvent>): KafkaTemplate<String, ParkingEvent> {
         return KafkaTemplate(producerFactory)
     }
 
+    /**
+     * Creates a Kafka producer factory for ZoneOccupancy messages.
+     *
+     * @return A configured ProducerFactory for ZoneOccupancy messages
+     */
     @Bean
     fun zoneOccupancyProducerFactory(): ProducerFactory<String, ZoneOccupancy> {
         val configProps = mapOf(
@@ -62,9 +90,14 @@ class DataGeneratorConfig(
         return DefaultKafkaProducerFactory(configProps)
     }
 
+    /**
+     * Creates a Kafka template for sending ZoneOccupancy messages.
+     *
+     * @param producerFactory The producer factory to use
+     * @return A configured KafkaTemplate for ZoneOccupancy messages
+     */
     @Bean
     fun zoneOccupancyKafkaTemplate(producerFactory: ProducerFactory<String, ZoneOccupancy>): KafkaTemplate<String, ZoneOccupancy> {
         return KafkaTemplate(producerFactory)
     }
-
 }

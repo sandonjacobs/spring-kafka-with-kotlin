@@ -17,6 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
+/**
+ * Component responsible for processing parking events using Kafka Streams.
+ * Maintains the current state of zone occupancy by joining parking events with the current occupancy state.
+ *
+ * @property parkingEventSerde Serde for serializing/deserializing ParkingEvent messages
+ * @property zoneOccupancySerde Serde for serializing/deserializing ZoneOccupancy messages
+ * @property parkingGarage The parking garage model containing zone information
+ * @property parkingEventsTopic Kafka topic for parking events
+ * @property zoneOccupancyTopic Kafka topic for zone occupancy updates
+ * @property zoneOccupancyStore Name of the state store for zone occupancy
+ */
 @Component
 class ParkingEventProcessor(
     val parkingEventSerde: Serde<ParkingEvent>,
@@ -28,6 +39,13 @@ class ParkingEventProcessor(
 ) {
     private val log = LoggerFactory.getLogger(ParkingEventProcessor::class.java)
 
+    /**
+     * Builds the Kafka Streams topology for processing parking events.
+     * Creates a KTable from the zone occupancy topic and joins it with the parking events stream
+     * to maintain the current state of zone occupancy.
+     *
+     * @param builder The StreamsBuilder used to construct the topology
+     */
     @Autowired
     fun buildPipeline(builder: StreamsBuilder) {
         log.info("Building topology with topics: parking-events={}, zone-occupancy={}", parkingEventsTopic, zoneOccupancyTopic)

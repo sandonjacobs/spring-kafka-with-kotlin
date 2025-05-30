@@ -17,6 +17,17 @@ import java.time.Instant
 import java.util.*
 import kotlin.random.Random
 
+/**
+ * Component responsible for generating and sending parking events to Kafka.
+ * Simulates vehicle entry and exit events for different parking zones.
+ *
+ * @property parkingEventTemplate Kafka template for sending parking events
+ * @property zoneOccupancyTemplate Kafka template for sending zone occupancy updates
+ * @property parkingGarage The parking garage model containing zone information
+ * @property cacheService Service for caching zone status information
+ * @property parkingEventsTopic Kafka topic for parking events
+ * @property zoneOccupancyTopic Kafka topic for zone occupancy updates
+ */
 @Component
 class ParkingEventGenerator(
     private val parkingEventTemplate: KafkaTemplate<String, ParkingEvent>,
@@ -29,6 +40,10 @@ class ParkingEventGenerator(
     private val log = LoggerFactory.getLogger(javaClass)
     private val random = Random(Instant.now().toEpochMilli())
 
+    /**
+     * Initializes the parking event generator by sending initial zone occupancy states.
+     * Called after the component is constructed.
+     */
     @PostConstruct
     fun init() {
         log.info("Initializing ParkingEventGenerator...")
@@ -39,6 +54,11 @@ class ParkingEventGenerator(
         }
     }
 
+    /**
+     * Periodically generates and sends vehicle entry events.
+     * Only sends events if there are available spaces in the selected zone.
+     * Runs every 1 second.
+     */
     @Scheduled(fixedRate = 1000)
     fun sendVehicleEnteredEvent() {
         val zone = parkingGarage.zones.random()
@@ -54,7 +74,10 @@ class ParkingEventGenerator(
         }
     }
 
-
+    /**
+     * Periodically generates and sends vehicle exit events.
+     * Runs every 1.5 seconds with an initial delay of 5 seconds.
+     */
     @Scheduled(fixedRate = 1500, initialDelay = 5000)
     fun sendVehicleExitEvent() {
         val zone = parkingGarage.zones.random()
@@ -62,5 +85,4 @@ class ParkingEventGenerator(
         log.debug("Sending EXIT parking event {} to topic {}", event, zone)
         parkingEventTemplate.send(parkingEventsTopic, zone.id, event)
     }
-
 }

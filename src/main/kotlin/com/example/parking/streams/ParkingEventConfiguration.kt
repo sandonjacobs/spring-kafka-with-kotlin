@@ -14,12 +14,24 @@ import org.springframework.kafka.annotation.EnableKafkaStreams
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration
 import org.springframework.kafka.config.KafkaStreamsConfiguration
 
+/**
+ * Configuration class for Kafka Streams processing of parking events.
+ * Sets up the streams configuration and serialization/deserialization for Protobuf messages.
+ *
+ * @property bootstrapServers Kafka bootstrap servers configuration
+ * @property schemaRegistryUrl URL of the Schema Registry for Protobuf serialization
+ */
 @Configuration
 @EnableKafkaStreams
 class ParkingEventConfiguration(
     @Value(value = "\${spring.kafka.bootstrap-servers}") val bootstrapServers: String,
     @Value(value = "\${spring.kafka.properties.[schema.registry.url]}") val schemaRegistryUrl: String) {
 
+    /**
+     * Creates the Kafka Streams configuration with necessary properties.
+     *
+     * @return A configured KafkaStreamsConfiguration instance
+     */
     @Bean(KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
     fun streamsConfig(): KafkaStreamsConfiguration = KafkaStreamsConfiguration(
         baseSchemaRegistryProps() + mapOf<String, Any>(
@@ -30,12 +42,27 @@ class ParkingEventConfiguration(
         )
     )
 
+    /**
+     * Creates base configuration properties for Schema Registry integration.
+     *
+     * @return Map of Schema Registry configuration properties
+     */
     private fun baseSchemaRegistryProps(): Map<String, Any> =
         mapOf(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl)
 
+    /**
+     * Creates base configuration properties for Serde configuration.
+     *
+     * @return Map of Serde configuration properties
+     */
     private fun baseSerdeProperties(): Map<String, Any> =
         mapOf(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to schemaRegistryUrl)
 
+    /**
+     * Creates a Serde for ParkingEvent messages.
+     *
+     * @return A configured Serde for ParkingEvent messages
+     */
     @Bean
     fun parkingEventSerde(): Serde<ParkingEvent> {
         val serde = KafkaProtobufSerde<ParkingEvent>()
@@ -45,6 +72,11 @@ class ParkingEventConfiguration(
         return serde
     }
 
+    /**
+     * Creates a Serde for ZoneOccupancy messages.
+     *
+     * @return A configured Serde for ZoneOccupancy messages
+     */
     @Bean
     fun zoneOccupancySerde(): Serde<ZoneOccupancy> {
         val serde = KafkaProtobufSerde<ZoneOccupancy>()
