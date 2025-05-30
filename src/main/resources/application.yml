@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: parking-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    properties:
+      "[schema.registry.url]": http://localhost:8081
+  cache:
+    type: caffeine
+    cache-names: parkingZones
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=1h
+
+kafka:
+  topics:
+    parking-events: parking-events-proto
+    zone-occupancy: parking-occupancy-by-zone
+  state-store:
+    zone-occupancy: zone-occupancy-state
+
+server:
+  port: 8080

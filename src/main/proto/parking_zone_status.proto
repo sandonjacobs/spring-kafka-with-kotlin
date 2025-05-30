@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.example.parking;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.parking.proto";
+
+message ParkingZoneStatus {
+  string zone_id = 1;
+  int32 occupied_spots = 2;
+  int32 available_spots = 3;
+  google.protobuf.Timestamp last_updated = 4;
+} 

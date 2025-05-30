@@ -30,3 +30,28 @@ gradle-app.setting
 *.ipr
 out/
 .idea_modules/
+
+# VS Code
+.vscode/
+
+# Help
+HELP.md
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
