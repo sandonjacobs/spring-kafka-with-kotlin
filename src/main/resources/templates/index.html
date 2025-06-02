@@ -110,6 +110,34 @@
             setTimeout(pollEvents, 2000);
         }
         window.addEventListener('DOMContentLoaded', pollEvents);
+
+        // --- Zone Status Polling ---
+        async function pollZoneStatuses() {
+            try {
+                const resp = await fetch('/api/zones');
+                if (!resp.ok) return;
+                const zones = await resp.json();
+                zones.forEach(zone => {
+                    const card = document.querySelector(`.zone-card[data-zone-id='${zone.zoneId}']`);
+                    if (card) {
+                        // Update status
+                        const statusDiv = card.querySelector('.status');
+                        if (statusDiv) {
+                            statusDiv.textContent = (zone.availableSpots > 0) ? 'Available' : 'Occupied';
+                            statusDiv.classList.remove('status-available', 'status-occupied');
+                            statusDiv.classList.add(zone.availableSpots > 0 ? 'status-available' : 'status-occupied');
+                        }
+                        // Update available slots
+                        const slotsDiv = card.querySelector('.available-slots');
+                        if (slotsDiv) {
+                            slotsDiv.textContent = `${zone.availableSpots} available slot(s)`;
+                        }
+                    }
+                });
+            } catch (e) {}
+            setTimeout(pollZoneStatuses, 2000);
+        }
+        window.addEventListener('DOMContentLoaded', pollZoneStatuses);
     </script>
 </head>
 <body>
@@ -122,7 +150,7 @@
                  th:text="${zone.availableSpots > 0 ? 'Available' : 'Occupied'}">
                 Status
             </div>
-            <div style="margin-top: 6px; color: #333; font-size: 1.1em;">
+            <div class="available-slots" style="margin-top: 6px; color: #333; font-size: 1.1em;">
                 <span th:text="${zone.availableSpots}"></span> available slot(s)
             </div>
             <div class="zone-events"></div>
