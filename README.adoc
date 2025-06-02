@@ -8,22 +8,6 @@ A Spring Boot application demonstrating real-time parking garage management usin
 [.lead]
 This application simulates a parking garage system that tracks vehicle entries and exits in real-time using Kafka for event streaming.
 
-[cols="1,1", grid=none, frame=none]
-|===
-|{nbsp} +
-[source,text]
-----
-  🚗  🚙  🚕
-  ╱╲  ╱╲  ╱╲
- ╱  ╲╱  ╲╱  ╲
-╱    ╱╲    ╱╲
-----
-|{nbsp} +
-*Real-time tracking of parking spaces*
-*Event-driven architecture with Kafka*
-*RESTful API for status queries*
-|===
-
 == Features ✨
 
 * Real-time parking space tracking
