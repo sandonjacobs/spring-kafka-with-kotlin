@@ -40,9 +40,9 @@ class DataGeneratorConfig(
             name = "Main Parking Garage",
             totalSpaces = 100,
             zones = listOf(
-                ParkingZone("A", "Zone A", 30, occupiedSpaces = 15),
-                ParkingZone("B", "Zone B", 40, occupiedSpaces = 25),
-                ParkingZone("C", "Zone C", 30, occupiedSpaces = 5)
+                ParkingZone("A", "Zone A", 30, occupiedSpaces = 25),
+                ParkingZone("B", "Zone B", 40, occupiedSpaces = 40),
+                ParkingZone("C", "Zone C", 30, occupiedSpaces = 28)
             )
         )
     }

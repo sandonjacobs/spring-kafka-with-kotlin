@@ -1,18 +1,17 @@
 package com.example.parking.controller
 
-import com.example.parking.model.ParkingZoneCacheStatus
-import com.example.parking.service.ParkingZoneCacheService
+import com.example.parking.model.ParkingGarage
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
 class ParkingZoneController(
-    private val parkingZoneCacheService: ParkingZoneCacheService
+    private val parkingGarage: ParkingGarage
 ) {
     @GetMapping("/")
     fun index(model: Model): String {
-        model.addAttribute("zones", parkingZoneCacheService.getAllZoneStatuses())
+        model.addAttribute("zones", parkingGarage.zones)
         return "index"
     }
 } 

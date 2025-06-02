@@ -78,7 +78,7 @@ class ParkingEventGenerator(
      * Periodically generates and sends vehicle exit events.
      * Runs every 1.5 seconds with an initial delay of 5 seconds.
      */
-    @Scheduled(fixedRate = 600, initialDelay = 5000)
+    @Scheduled(fixedRate = 600, initialDelay = 3000)
     fun sendVehicleExitEvent() {
         val zone = parkingGarage.zones.random()
         val event = parkingGarage.generateParkingEvent(zone.id, EventType.VEHICLE_EXITED)

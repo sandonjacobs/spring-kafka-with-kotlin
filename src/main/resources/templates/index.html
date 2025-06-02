@@ -70,13 +70,27 @@
             from { opacity: 0; transform: translateX(40px); }
             to   { opacity: 1; transform: translateX(0); }
         }
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #eee;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .last-updated {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 4px;
+        }
     </style>
     <script>
-        // Auto-refresh the page every 5 seconds (for status)
-        setTimeout(function() {
-            window.location.reload();
-        }, 5000);
-
         // --- Event Animation Logic ---
         window.zoneEventTimestamps = window.zoneEventTimestamps || {};
         function renderEvents(events) {
@@ -111,15 +125,23 @@
         }
         window.addEventListener('DOMContentLoaded', pollEvents);
 
-        // --- Zone Status Polling ---
-        async function pollZoneStatuses() {
-            try {
-                const resp = await fetch('/api/zones');
-                if (!resp.ok) return;
-                const zones = await resp.json();
-                zones.forEach(zone => {
-                    const card = document.querySelector(`.zone-card[data-zone-id='${zone.zoneId}']`);
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const d = new Date(isoString);
+            return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        }
+        // --- Per-card polling for zone status ---
+        function pollZoneStatus(zoneId) {
+            async function poll() {
+                const card = document.querySelector(`.zone-card[data-zone-id='${zoneId}']`);
+                const spinner = card.querySelector('.spinner');
+                try {
+                    const resp = await fetch(`/api/zones/${zoneId}`);
+                    if (!resp.ok) return;
+                    const zone = await resp.json();
                     if (card) {
+                        // Hide spinner
+                        if (spinner) spinner.style.display = 'none';
                         // Update status
                         const statusDiv = card.querySelector('.status');
                         if (statusDiv) {
@@ -132,27 +154,38 @@
                         if (slotsDiv) {
                             slotsDiv.textContent = `${zone.availableSpots} available slot(s)`;
                         }
+                        // Update last updated
+                        const lastUpdatedDiv = card.querySelector('.last-updated');
+                        if (lastUpdatedDiv && zone.lastUpdated) {
+                            lastUpdatedDiv.textContent = 'Last updated: ' + formatTime(zone.lastUpdated);
+                        }
                     }
-                });
-            } catch (e) {}
-            setTimeout(pollZoneStatuses, 2000);
+                } catch (e) {
+                    if (spinner) spinner.style.display = '';
+                }
+                setTimeout(poll, 2000);
+            }
+            poll();
         }
-        window.addEventListener('DOMContentLoaded', pollZoneStatuses);
+        window.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.zone-card').forEach(card => {
+                const zoneId = card.getAttribute('data-zone-id');
+                pollZoneStatus(zoneId);
+            });
+        });
     </script>
 </head>
 <body>
     <h1>Parking Zone Status</h1>
     <div class="zone-grid">
-        <div th:each="zone : ${zones}" class="zone-card" th:attr="data-zone-id=${zone.zoneId}">
-            <div class="zone-id" th:text="${'Zone ' + zone.zoneId}">Zone ID</div>
-            <div class="status" 
-                 th:classappend="${zone.availableSpots > 0 ? 'status-available' : 'status-occupied'}"
-                 th:text="${zone.availableSpots > 0 ? 'Available' : 'Occupied'}">
-                Status
-            </div>
+        <div th:each="zone : ${zones}" class="zone-card" th:attr="data-zone-id=${zone.id}">
+            <div class="zone-id" th:text="${'Zone ' + zone.id}">Zone ID</div>
+            <div class="spinner"></div>
+            <div class="status status-occupied" th:text="'Loading...'">Status</div>
             <div class="available-slots" style="margin-top: 6px; color: #333; font-size: 1.1em;">
-                <span th:text="${zone.availableSpots}"></span> available slot(s)
+                Loading...
             </div>
+            <div class="last-updated"></div>
             <div class="zone-events"></div>
         </div>
     </div>

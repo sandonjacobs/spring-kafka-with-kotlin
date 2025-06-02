@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import com.example.parking.model.ParkingZoneEvent
 
@@ -23,6 +24,13 @@ class ZoneController(
     private val cacheService: ParkingZoneCacheService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    data class ZoneStatusDTO(
+        val zoneId: String,
+        val occupiedSpots: Int,
+        val availableSpots: Int,
+        val lastUpdated: String?
+    )
 
     /**
      * Retrieves the current status of all parking zones.
@@ -45,5 +53,22 @@ class ZoneController(
     @GetMapping("/api/zones/events", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getRecentZoneEvents(): ResponseEntity<List<ParkingZoneEvent>> {
         return ResponseEntity.ok(cacheService.getRecentEvents())
+    }
+
+    @GetMapping("/api/zones/{zoneId}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getZoneStatus(@PathVariable zoneId: String): ResponseEntity<Any> {
+        val status = cacheService.getZoneStatus(zoneId)
+        return if (status != null) {
+            ResponseEntity.ok(
+                ZoneStatusDTO(
+                    zoneId = status.zoneId,
+                    occupiedSpots = status.occupiedSpots,
+                    availableSpots = status.availableSpots,
+                    lastUpdated = status.lastUpdated.toString()
+                )
+            )
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 }
