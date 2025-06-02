@@ -1,12 +1,16 @@
 package com.example.parking.service
 
 import com.example.parking.model.ParkingZoneCacheStatus
+import com.example.parking.model.ParkingZoneEvent
+import com.example.parking.model.ParkingZoneEventType
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.caffeine.CaffeineCache
 import org.springframework.stereotype.Service
+import kotlinx.datetime.Clock
+import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * Service responsible for caching and managing parking zone status information.
@@ -19,6 +23,10 @@ import org.springframework.stereotype.Service
 class ParkingZoneCacheService(
     private val cacheManager: CacheManager
 ) {
+
+    // In-memory event log for UI animation
+    private val eventLog: ConcurrentLinkedQueue<ParkingZoneEvent> = ConcurrentLinkedQueue()
+    private val maxEvents = 50 // keep last 50 events
 
     /**
      * Retrieves the current status of a parking zone from the cache.
@@ -58,4 +66,11 @@ class ParkingZoneCacheService(
             .filterIsInstance<ParkingZoneCacheStatus>()
             .toList()
     }
+
+    fun logZoneEvent(zoneId: String, eventType: ParkingZoneEventType) {
+        eventLog.add(ParkingZoneEvent(zoneId, eventType, Clock.System.now()))
+        while (eventLog.size > maxEvents) eventLog.poll()
+    }
+
+    fun getRecentEvents(): List<ParkingZoneEvent> = eventLog.toList()
 } 

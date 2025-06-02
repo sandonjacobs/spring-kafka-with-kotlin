@@ -3,6 +3,7 @@ package com.example.parking.consumer
 import com.example.parking.model.ParkingZoneCacheStatus
 import com.example.parking.model.ZoneOccupancy
 import com.example.parking.service.ParkingZoneCacheService
+import com.example.parking.model.ParkingZoneEventType
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
@@ -33,6 +34,15 @@ class ZoneStatusConsumer(
         val status = ParkingZoneCacheStatus.fromZoneOccupancy(occupancy)
         logger.info("Updating cache for zone {}: {} spots occupied, {} spots available", 
             status.zoneId, status.occupiedSpots, status.availableSpots)
+        // Determine event type by comparing with previous status
+        val prev = cacheService.getZoneStatus(status.zoneId)
+        if (prev != null) {
+            if (status.availableSpots > prev.availableSpots) {
+                cacheService.logZoneEvent(status.zoneId, ParkingZoneEventType.EXIT)
+            } else if (status.availableSpots < prev.availableSpots) {
+                cacheService.logZoneEvent(status.zoneId, ParkingZoneEventType.ENTER)
+            }
+        }
         cacheService.updateZoneStatus(status)
     }
 } 

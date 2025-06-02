@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
+import com.example.parking.model.ParkingZoneEvent
 
 /**
  * REST controller for managing parking zone status information.
@@ -39,5 +40,10 @@ class ZoneController(
         } else {
             return ResponseEntity.ok().body(statuses)
         }
+    }
+
+    @GetMapping("/api/zones/events", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getRecentZoneEvents(): ResponseEntity<List<ParkingZoneEvent>> {
+        return ResponseEntity.ok(cacheService.getRecentEvents())
     }
 }

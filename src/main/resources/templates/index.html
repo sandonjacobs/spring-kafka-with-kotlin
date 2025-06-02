@@ -42,24 +42,90 @@
         h1 {
             color: #333;
         }
+        .zone-events {
+            margin-top: 10px;
+            min-height: 32px;
+            display: flex;
+            gap: 8px;
+        }
+        .event-car {
+            font-size: 1.5em;
+            opacity: 0;
+            transform: translateX(0);
+            transition: opacity 0.3s, transform 0.5s;
+        }
+        .event-car.enter {
+            color: #4CAF50;
+            animation: car-enter 1s forwards;
+        }
+        .event-car.exit {
+            color: #f44336;
+            animation: car-exit 1s forwards;
+        }
+        @keyframes car-enter {
+            from { opacity: 0; transform: translateX(-40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes car-exit {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
     </style>
     <script>
-        // Auto-refresh the page every 5 seconds
+        // Auto-refresh the page every 5 seconds (for status)
         setTimeout(function() {
             window.location.reload();
         }, 5000);
+
+        // --- Event Animation Logic ---
+        window.zoneEventTimestamps = window.zoneEventTimestamps || {};
+        function renderEvents(events) {
+            // Group events by zoneId
+            const grouped = {};
+            events.forEach(ev => {
+                if (!grouped[ev.zoneId]) grouped[ev.zoneId] = [];
+                grouped[ev.zoneId].push(ev);
+            });
+            // For each zone card, update the events row
+            document.querySelectorAll('.zone-card').forEach(card => {
+                const zoneId = card.getAttribute('data-zone-id');
+                const eventsRow = card.querySelector('.zone-events');
+                eventsRow.innerHTML = '';
+                const zoneEvts = (grouped[zoneId] || []).slice(-5); // last 5 events
+                zoneEvts.forEach(ev => {
+                    const span = document.createElement('span');
+                    span.className = 'event-car ' + (ev.eventType === 'ENTER' ? 'enter' : 'exit');
+                    span.textContent = ev.eventType === 'ENTER' ? '🚗' : '🚙';
+                    eventsRow.appendChild(span);
+                });
+            });
+        }
+        async function pollEvents() {
+            try {
+                const resp = await fetch('/api/zones/events');
+                if (!resp.ok) return;
+                const events = await resp.json();
+                renderEvents(events);
+            } catch (e) {}
+            setTimeout(pollEvents, 2000);
+        }
+        window.addEventListener('DOMContentLoaded', pollEvents);
     </script>
 </head>
 <body>
     <h1>Parking Zone Status</h1>
     <div class="zone-grid">
-        <div th:each="zone : ${zones}" class="zone-card">
+        <div th:each="zone : ${zones}" class="zone-card" th:attr="data-zone-id=${zone.zoneId}">
             <div class="zone-id" th:text="${'Zone ' + zone.zoneId}">Zone ID</div>
             <div class="status" 
                  th:classappend="${zone.availableSpots > 0 ? 'status-available' : 'status-occupied'}"
                  th:text="${zone.availableSpots > 0 ? 'Available' : 'Occupied'}">
                 Status
             </div>
+            <div style="margin-top: 6px; color: #333; font-size: 1.1em;">
+                <span th:text="${zone.availableSpots}"></span> available slot(s)
+            </div>
+            <div class="zone-events"></div>
         </div>
     </div>
 </body>
