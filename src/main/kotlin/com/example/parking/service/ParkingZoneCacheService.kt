@@ -1,6 +1,6 @@
 package com.example.parking.service
 
-import com.example.parking.model.ParkingZoneStatus
+import com.example.parking.model.ParkingZoneCacheStatus
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CachePut
@@ -28,7 +28,7 @@ class ParkingZoneCacheService(
      * @return The current status of the zone, or null if not in cache
      */
     @Cacheable(key = "#zoneId", unless = "#result == null")
-    fun getZoneStatus(zoneId: String): ParkingZoneStatus? {
+    fun getZoneStatus(zoneId: String): ParkingZoneCacheStatus? {
         // If not in cache, return null - the cache will be populated by the Kafka consumer
         return null
     }
@@ -40,7 +40,7 @@ class ParkingZoneCacheService(
      * @return The cached status
      */
     @CachePut(key = "#status.zoneId")
-    fun updateZoneStatus(status: ParkingZoneStatus): ParkingZoneStatus {
+    fun updateZoneStatus(status: ParkingZoneCacheStatus): ParkingZoneCacheStatus {
         return status
     }
 
@@ -50,12 +50,12 @@ class ParkingZoneCacheService(
      * @return A list of all cached zone statuses
      * @throws IllegalStateException if the cache is not found
      */
-    fun getAllZoneStatuses(): List<ParkingZoneStatus> {
+    fun getAllZoneStatuses(): List<ParkingZoneCacheStatus> {
         val cache = cacheManager.getCache("parkingZones")
             ?: throw IllegalStateException("Cache 'parkingZones' not found")
 
         return (cache as CaffeineCache).nativeCache.asMap().values
-            .filterIsInstance<ParkingZoneStatus>()
+            .filterIsInstance<ParkingZoneCacheStatus>()
             .toList()
     }
 } 

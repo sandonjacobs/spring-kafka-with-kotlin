@@ -1,6 +1,6 @@
 package com.example.parking.consumer
 
-import com.example.parking.model.ParkingZoneStatus
+import com.example.parking.model.ParkingZoneCacheStatus
 import com.example.parking.model.ZoneOccupancy
 import com.example.parking.service.ParkingZoneCacheService
 import org.slf4j.LoggerFactory
@@ -21,7 +21,7 @@ class ZoneStatusConsumer(
     
     /**
      * Consumes zone occupancy updates from Kafka and updates the cache.
-     * Converts the ZoneOccupancy message to a ParkingZoneStatus and stores it in the cache.
+     * Converts the ZoneOccupancy message to a ParkingZoneCacheStatus and stores it in the cache.
      *
      * @param occupancy The ZoneOccupancy message received from Kafka
      */
@@ -30,7 +30,7 @@ class ZoneStatusConsumer(
         groupId = "zone-status-cache-updater"
     )
     fun consumeZoneStatus(occupancy: ZoneOccupancy) {
-        val status = ParkingZoneStatus.fromZoneOccupancy(occupancy)
+        val status = ParkingZoneCacheStatus.fromZoneOccupancy(occupancy)
         logger.info("Updating cache for zone {}: {} spots occupied, {} spots available", 
             status.zoneId, status.occupiedSpots, status.availableSpots)
         cacheService.updateZoneStatus(status)

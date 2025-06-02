@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  * @property lastUpdated The timestamp when this status was last updated
  */
 @Serializable
-data class ParkingZoneStatus(
+data class ParkingZoneCacheStatus(
     val zoneId: String,
     val occupiedSpots: Int,
     val availableSpots: Int,
@@ -22,17 +22,17 @@ data class ParkingZoneStatus(
 
     companion object {
         /**
-         * Creates a [ParkingZoneStatus] from a [ZoneOccupancy] message.
+         * Creates a [ParkingZoneCacheStatus] from a [ZoneOccupancy] message.
          * 
          * This function maps the occupancy information from the Kafka Streams state store
          * to our application's cache model. It calculates the available spots by subtracting
          * the occupied spaces from the total spaces.
          *
          * @param occupancy The [ZoneOccupancy] message from the Kafka Streams state store
-         * @return A new [ParkingZoneStatus] instance with the mapped data and current timestamp
+         * @return A new [ParkingZoneCacheStatus] instance with the mapped data and current timestamp
          */
-        fun fromZoneOccupancy(occupancy: ZoneOccupancy): ParkingZoneStatus {
-            return ParkingZoneStatus(
+        fun fromZoneOccupancy(occupancy: ZoneOccupancy): ParkingZoneCacheStatus {
+            return ParkingZoneCacheStatus(
                 zoneId = occupancy.zoneId,
                 occupiedSpots = occupancy.occupiedSpaces,
                 availableSpots = occupancy.totalSpaces - occupancy.occupiedSpaces,
