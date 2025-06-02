@@ -11,7 +11,7 @@ This application simulates a parking garage system that tracks vehicle entries a
 [cols="1,1", grid=none, frame=none]
 |===
 |{nbsp} +
-[source,asciidoc]
+[source,text]
 ----
   🚗  🚙  🚕
   ╱╲  ╱╲  ╱╲
@@ -36,29 +36,15 @@ This application simulates a parking garage system that tracks vehicle entries a
 
 == Architecture 🏗️
 
-[cols="1,1", grid=none, frame=none]
-|===
-|{nbsp} +
-[source,asciidoc]
-----
-┌─────────┐    ┌─────────┐    ┌─────────┐
-│  Event  │    │  Kafka  │    │  Cache  │
-│Generator│───>│ Streams │───>│ Service │
-└─────────┘    └─────────┘    └─────────┘
-      │             │              │
-      │             │              │
-      ▼             ▼              ▼
-┌─────────┐    ┌─────────┐    ┌─────────┐
-│ Parking │    │  REST   │    │  Zone   │
-│ Events  │    │  API    │    │ Status  │
-└─────────┘    └─────────┘    └─────────┘
-----
-|{nbsp} +
-*Event Generation*
-*Stream Processing*
-*Status Caching*
-*REST API*
-|===
+The system is designed for real-time, event-driven updates:
+
+- The **Event Generator** simulates vehicle entries and exits, sending events to Kafka.
+- **Kafka Streams** processes these events and maintains the current occupancy state for each parking zone.
+- The **Cache Service** keeps a fast, in-memory view of the latest zone statuses and recent events.
+- The **REST API** exposes endpoints for querying zone status and recent events.
+- The **Web UI** polls the API for live updates, displaying animated, real-time status for each zone.
+
+This architecture enables low-latency, scalable, and highly interactive monitoring of parking activity.
 
 == Requirements 📋
 
