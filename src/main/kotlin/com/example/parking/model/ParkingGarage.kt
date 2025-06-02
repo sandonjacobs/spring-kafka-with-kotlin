@@ -4,12 +4,14 @@ import org.slf4j.LoggerFactory
 import java.time.Instant
 
 /**
- * Represents a parking garage with multiple zones and total capacity.
+ * Represents a parking garage containing multiple zones and overall capacity.
  *
  * @property id Unique identifier for the parking garage
  * @property name Display name of the parking garage
  * @property totalSpaces Total number of parking spaces across all zones
- * @property zones List of parking zones within the garage
+ * @property zones List of [ParkingZone]s within the garage
+ *
+ * Usage: Used as the authoritative source of garage structure for the UI and event generation.
  */
 class ParkingGarage(
     val id: String,
@@ -20,11 +22,11 @@ class ParkingGarage(
     private val log = LoggerFactory.getLogger(ParkingGarage::class.java)
 
     /**
-     * Generates a parking event for a specific zone.
+     * Generates a [ParkingEvent] for a specific zone and event type.
      *
      * @param zoneId The ID of the zone where the event occurred
      * @param eventType The type of event (vehicle entered or exited)
-     * @return A new ParkingEvent with the current timestamp
+     * @return A new [ParkingEvent] with the current timestamp
      */
     fun generateParkingEvent(zoneId: String, eventType: EventType): ParkingEvent {
         return ParkingEvent.newBuilder()
@@ -45,12 +47,14 @@ class ParkingGarage(
 }
 
 /**
- * Represents a zone within a parking garage.
+ * Represents a single zone within a parking garage.
  *
- * @property id Unique identifier for the zone
+ * @property id Unique identifier for the zone (used as zoneId in events and cache)
  * @property name Display name of the zone
  * @property totalSpaces Total number of parking spaces in this zone
  * @property occupiedSpaces Number of currently occupied spaces in this zone
+ *
+ * Usage: Used for garage structure, event generation, and initial UI rendering.
  */
 class ParkingZone(
     val id: String,
@@ -60,9 +64,12 @@ class ParkingZone(
 )
 
 /**
- * Generates a ZoneOccupancy message from this ParkingZone.
+ * Extension function to generate a [ZoneOccupancy] message from a [ParkingZone].
  *
- * @return A ZoneOccupancy message containing the current occupancy information
+ * Used for sending initial or updated occupancy information to Kafka Streams.
+ *
+ * @receiver The [ParkingZone] to generate occupancy for
+ * @return A [ZoneOccupancy] message containing the current occupancy information
  */
 fun ParkingZone.generateZoneOccupancy(): ZoneOccupancy {
     return ZoneOccupancy.newBuilder()

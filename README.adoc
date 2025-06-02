@@ -32,6 +32,7 @@ This application simulates a parking garage system that tracks vehicle entries a
 * REST API for querying parking status
 * Caching layer for quick status lookups
 * Protocol Buffers for efficient message serialization
+* **Live web dashboard with per-zone status, animated event flow, and real-time updates**
 
 == Architecture 🏗️
 
@@ -90,9 +91,27 @@ This application simulates a parking garage system that tracks vehicle entries a
 ./gradlew bootRun
 ----
 
+== Real-Time Web UI 🖥️
+
+The application includes a modern, real-time dashboard for visualizing parking zone status:
+
+* **Live status cards** for each parking zone, showing:
+  * Zone name/ID
+  * Current status (Available/Occupied)
+  * Number of available slots
+  * Animated car icons for recent entry/exit events
+  * Last updated timestamp
+* **No page reloads:** Each card updates itself in real time using AJAX polling.
+* **Smooth animations:** Car icons animate in/out as vehicles enter or exit zones.
+* **Mobile-friendly, responsive layout**
+
+To use the dashboard, run the app and visit: `http://localhost:8080/`
+
 == API Endpoints 🌐
 
 * `GET /api/zones` - Get current status of all parking zones
+* `GET /api/zones/{zoneId}` - Get current status for a single zone (for per-card polling)
+* `GET /api/zones/events` - Get recent entry/exit events for all zones (for UI animation)
 
 == Technology Stack 💻
 

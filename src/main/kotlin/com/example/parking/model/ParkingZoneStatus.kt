@@ -5,12 +5,14 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 /**
- * Represents the current status of a parking zone, including occupancy information and last update time.
+ * Represents the cached status of a parking zone, including occupancy and last update time.
  *
- * @property zoneId The unique identifier of the parking zone
- * @property occupiedSpots The number of currently occupied parking spots in the zone
- * @property availableSpots The number of currently available parking spots in the zone
- * @property lastUpdated The timestamp when this status was last updated
+ * This class is used by the caching layer and UI to provide real-time status for each zone.
+ *
+ * @property zoneId Unique identifier for the parking zone (matches ParkingZone.id)
+ * @property occupiedSpots Number of currently occupied parking spots in the zone
+ * @property availableSpots Number of currently available parking spots in the zone
+ * @property lastUpdated Timestamp (UTC) when this status was last updated
  */
 @Serializable
 data class ParkingZoneCacheStatus(
@@ -22,14 +24,12 @@ data class ParkingZoneCacheStatus(
 
     companion object {
         /**
-         * Creates a [ParkingZoneCacheStatus] from a [ZoneOccupancy] message.
-         * 
-         * This function maps the occupancy information from the Kafka Streams state store
-         * to our application's cache model. It calculates the available spots by subtracting
-         * the occupied spaces from the total spaces.
+         * Maps a [ZoneOccupancy] message (from Kafka Streams) to a [ParkingZoneCacheStatus] for caching and UI.
+         *
+         * Calculates available spots by subtracting occupied from total.
          *
          * @param occupancy The [ZoneOccupancy] message from the Kafka Streams state store
-         * @return A new [ParkingZoneCacheStatus] instance with the mapped data and current timestamp
+         * @return A new [ParkingZoneCacheStatus] instance with mapped data and current timestamp
          */
         fun fromZoneOccupancy(occupancy: ZoneOccupancy): ParkingZoneCacheStatus {
             return ParkingZoneCacheStatus(

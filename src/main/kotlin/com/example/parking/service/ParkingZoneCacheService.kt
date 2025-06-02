@@ -13,8 +13,12 @@ import kotlinx.datetime.Clock
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
- * Service responsible for caching and managing parking zone status information.
- * Uses Spring's caching abstraction with Caffeine as the underlying cache implementation.
+ * Service responsible for caching and managing parking zone status information and recent events.
+ *
+ * Uses Spring's caching abstraction with Caffeine for fast, in-memory access to zone status.
+ * Also maintains a thread-safe in-memory event log for UI animation of recent entry/exit events.
+ *
+ * Thread-safe: All cache and event log operations are safe for concurrent use.
  *
  * @property cacheManager Spring's cache manager for handling cache operations
  */
@@ -24,13 +28,13 @@ class ParkingZoneCacheService(
     private val cacheManager: CacheManager
 ) {
 
-    // In-memory event log for UI animation
+    // In-memory event log for UI animation (thread-safe, capped at maxEvents)
     private val eventLog: ConcurrentLinkedQueue<ParkingZoneEvent> = ConcurrentLinkedQueue()
     private val maxEvents = 50 // keep last 50 events
 
     /**
      * Retrieves the current status of a parking zone from the cache.
-     * If the zone is not in cache, returns null as the cache will be populated by the Kafka consumer.
+     * If the zone is not in cache, returns null (cache will be populated by the Kafka consumer).
      *
      * @param zoneId The ID of the zone to retrieve status for
      * @return The current status of the zone, or null if not in cache
@@ -67,10 +71,22 @@ class ParkingZoneCacheService(
             .toList()
     }
 
+    /**
+     * Logs a recent entry or exit event for a zone, for UI animation/history.
+     * Maintains a rolling buffer of the most recent [maxEvents] events.
+     *
+     * @param zoneId The zone where the event occurred
+     * @param eventType The type of event (ENTER or EXIT)
+     */
     fun logZoneEvent(zoneId: String, eventType: ParkingZoneEventType) {
         eventLog.add(ParkingZoneEvent(zoneId, eventType, Clock.System.now()))
         while (eventLog.size > maxEvents) eventLog.poll()
     }
 
+    /**
+     * Returns a list of recent entry/exit events for all zones (for UI animation).
+     *
+     * @return List of recent [ParkingZoneEvent]s (most recent last)
+     */
     fun getRecentEvents(): List<ParkingZoneEvent> = eventLog.toList()
 } 
