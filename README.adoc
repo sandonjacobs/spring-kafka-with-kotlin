@@ -123,6 +123,15 @@ src/main/kotlin/com/example/parking/
 └── generator/    # Event generation
 ----
 
+=== Makefile Tasks
+
+A Makefile is provided for common development tasks such as starting/stopping Kafka, building, testing, generating protobuf classes, and running the app. To see all available commands, run:
+
+[source,bash]
+----
+make help
+----
+
 == License 📄
 
 This project is licensed under the MIT License - see the LICENSE file for details.
